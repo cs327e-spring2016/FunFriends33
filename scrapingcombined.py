@@ -14,24 +14,23 @@ url_extensions = bsObj_inventory.findAll('a', {'class':'inv-view-details'})
 # so we can go to each car's individual page to get information about it
 urls_to_scrape = []
 for i in range(len(url_extensions)) :
-	current = url_extensions[i]
-	url_extension = current.attrs['href']
-	print(url_extension)
-	extended_url = 'http://www.rangermotorsaustin.com' + url_extension
-	urls_to_scrape.append(extended_url)
+    current = url_extensions[i]
+    url_extension = current.attrs['href']
+    print(url_extension)
+    extended_url = 'http://www.rangermotorsaustin.com' + url_extension
+    urls_to_scrape.append(extended_url)
 
 # now print out the attributes of each car in turn
 for i in range(len(urls_to_scrape)):
-	car_url = urls_to_scrape[i]
-	print (car_url)
-	html = urlopen(str(car_url))
-	bsObj = BeautifulSoup(html.read(), 'html.parser')
-	attribute = bsObj.findAll('span', {'class':'strong'})
-	value = bsObj.findAll('span', {'class':'pull-right'})
-	aaa_list = bsObj.findAll('li', {'class':'list-group-item'})
+    car_url = urls_to_scrape[i]
+    print (car_url)
+    html = urlopen(str(car_url))
+    bsObj = BeautifulSoup(html.read(), 'html.parser')
+    attribute = bsObj.findAll('span', {'class':'strong'})
+    value = bsObj.findAll('span', {'class':'pull-right'})
+    aaa_list = bsObj.findAll('li', {'class':'list-group-item'})
 
-
-for x in attribute :
-	print(x.get_text())
-for y in value :
-	print(y.get_text())
+    for x in attribute :
+        print(x.get_text())
+    for y in value :
+        print(y.get_text())
