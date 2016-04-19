@@ -1,8 +1,8 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pymysql
+import string 
 
-<<<<<<< Updated upstream
 def scrape ():
 
     # this program web scrapes the url's from Ranger Motor's inventory page
@@ -24,14 +24,18 @@ def scrape ():
         extended_url = 'http://www.rangermotorsaustin.com' + url_extension
         urls_to_scrape.append(extended_url)
 
-    # now print out the attributes of each car in turn
-    for i in range(len(urls_to_scrape)):
+    # now collect the attributes of each car in turn
+    # and put them in the database
+    for i in range(3): # only do first 3 for testing purposes             #len(urls_to_scrape)):
         car_url = urls_to_scrape[i]
         html = urlopen(str(car_url))
         bsObj = BeautifulSoup(html.read(), 'html.parser')
         attribute = bsObj.findAll('span', {'class':'strong'})
         value = bsObj.findAll('span', {'class':'pull-right'})
-        aaa_list = bsObj.findAll('li', {'class':'list-group-item'})
+        price_html = str(bsObj.find('span', {'class':'details-price'}))
+        # get the price string for the car
+        price = get_price(price_html)
+        # aaa_list = bsObj.findAll('li', {'class':'list-group-item'})
 
 
 
@@ -42,6 +46,11 @@ def scrape ():
         for z in attribute :
             attribute2.append(z.get_text())
 
+        # since price comes from a separate part of the webpage, we handle it separately:
+        # add the price to the end of the values list and the attribute name 'Price' to the end of the attributes list
+        value2.append(price)
+        attribute2.append('Price')
+        print(attribute2[0])
 
         dbwrite(value2, attribute2)
 
@@ -50,10 +59,30 @@ def scrape ():
 #If a value is not there we need to add null instead
 #fill the values with null.
 
+# this function parses the html section containing the price and returns the string of the integer value of the price 
+# i.e., gets rid of dollar signs, commas, html tags, etc. 
+def get_price(price_mess):
+    price = ''
+    price_mess.strip()
+    for ch in price_mess:
+        if ch.isdigit():
+            price += ch 
+    return price 
+
+# this function takes some attribute values and enters them into the database
 def dbwrite (values, attributes):
 
+    
+    '''        ------- David's Connection------
     conn = pymysql.connect(host='localhost', port = 3306,
                         user = 'root', passwd='lenneth6')
+    '''
+
+    '''        ------- Adam's Connection------ '''
+    conn = pymysql.connect(host='127.0.0.1', unix_socket='/tmp/mysql.sock', 
+                           user='dbproject',passwd='cs327e', db='mysql', charset='utf8')
+    '''
+    '''
 
     cur = conn.cursor()
 
@@ -93,7 +122,11 @@ def main():
 
 
 main()
-=======
+
+
+# i'm pretty sure that everything below is just trash that resulted from github doing a piss poor job of merging our work
+################################################################################
+'''
 inventory_page = 'http://www.rangermotorsaustin.com/inventory/'
 
 # here we set up the beautiful soup object to extract info from the webpages,
@@ -126,5 +159,4 @@ for i in range(len(urls_to_scrape)):
         print(x.get_text())
     for y in value :
         print(y.get_text())
-
->>>>>>> Stashed changes
+'''
