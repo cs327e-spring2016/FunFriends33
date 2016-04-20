@@ -50,9 +50,9 @@ def scrape ():
         # add the price to the end of the values list and the attribute name 'Price' to the end of the attributes list
         value2.append(price)
         attribute2.append('Price')
-        print(attribute2[0])
+        print(value2[-1])
 
-        dbwrite(value2, attribute2)
+        #dbwrite(value2, attribute2)
 
 #values and attributes are pairwise the same length
 #but they are not the same length all the time, so we need to check the attributes that a given car has before entering.
