@@ -26,7 +26,9 @@ def scrape ():
 
     # now collect the attributes of each car in turn
     # and put them in the database
-    for i in range(3): # only do first 3 for testing purposes             #len(urls_to_scrape)):
+    allattributes = []
+
+    for i in range(len(urls_to_scrape)): # only do first 3 for testing purposes             #len(urls_to_scrape)):
         car_url = urls_to_scrape[i]
         html = urlopen(str(car_url))
         bsObj = BeautifulSoup(html.read(), 'html.parser')
@@ -50,9 +52,14 @@ def scrape ():
         # add the price to the end of the values list and the attribute name 'Price' to the end of the attributes list
         value2.append(price)
         attribute2.append('Price')
-        print(value2[-1])
 
-        #dbwrite(value2, attribute2)
+        allattributes = ['Year', 'Make', 'Model', 'Body style', '\n\t\t\t\t\t\t                                                    Mileage\n                                                \t\t\t\t\t', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon', 'Price']
+        
+
+        fillnulls(value2, attribute2, allattributes)
+
+
+        #dbwrite(value2, allattributes)
 
 #values and attributes are pairwise the same length
 #but they are not the same length all the time, so we need to check the attributes that a given car has before entering.
@@ -70,19 +77,28 @@ def get_price(price_mess):
     return price 
 
 # this function takes some attribute values and enters them into the database
+
+def fillnulls(values,attributes, allattributes):
+
+    for i in range(len(allattributes)) :
+        if allattributes[i] not in attributes :
+            values.insert(i, 'NULL')
+
+
+
 def dbwrite (values, attributes):
 
     
-    '''        ------- David's Connection------
+    '''        ------- David's Connection------ '''
     conn = pymysql.connect(host='localhost', port = 3306,
                         user = 'root', passwd='lenneth6')
-    '''
+    
 
-    '''        ------- Adam's Connection------ '''
+    '''        ------- Adam's Connection------ 
     conn = pymysql.connect(host='127.0.0.1', unix_socket='/tmp/mysql.sock', 
                            user='dbproject',passwd='cs327e', db='mysql', charset='utf8')
     '''
-    '''
+    
 
     cur = conn.cursor()
 
