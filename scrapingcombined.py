@@ -26,7 +26,6 @@ def scrape ():
 
     # now collect the attributes of each car in turn
     # and put them in the database
-    allattributes = []
 
     for i in range(len(urls_to_scrape)): # only do first 3 for testing purposes             #len(urls_to_scrape)):
         car_url = urls_to_scrape[i]
@@ -59,7 +58,7 @@ def scrape ():
         fillnulls(value2, attribute2, allattributes)
 
 
-        #dbwrite(value2, allattributes)
+        dbwrite(value2, allattributes)
 
 #values and attributes are pairwise the same length
 #but they are not the same length all the time, so we need to check the attributes that a given car has before entering.
@@ -110,17 +109,29 @@ def dbwrite (values, attributes):
     #this checks that the vin number is not already in the table
     vinlist = list(cur.fetchall())
     for i in range(len(vinlist)) :
-        if vinlist[i] == attributes[12] :
+        if vinlist[i] == values[12] :
             return
 
-    print(len(attributes))
-    print (attributes)
-    #attribute[12] is the vin number
-    stringer = str("INSERT INTO inventory (vin_number, model_name, ext_color_id, int_color_id) VALUES (" + attributes[12] +"," + attributes[2] + "," +  attributes[9] + "," + attributes[10] + ")")
-    stringer2 = str("UPDATE inventory set year =" + attributes[0] + ", mileage =" + attributes[4] + ", conditions = " + attributes[14] + "WHERE vin_number = " + attributes[12])
+    print(get_price(values[4]))
 
-    print (stringer)
-    print (stringer2)
+
+
+    #values[12] is the vin number
+    stringer = str("INSERT INTO inventory (vin_number, model_name, ext_color, int_color) VALUES ('" + values[12] +"','" + values[2] + "','" +  values[9] + "','" + values[10] + "')")
+    stringer2 = str("UPDATE inventory set year ='" + values[0] + "', mileage ='" + get_price(values[4]) + "', conditions = '" + values[14] + "' WHERE vin_number = '" + values[12] + "' ")
+    stringer3 = str("UPDATE inventory set make ='" + values[1] +"', transmission = '" + values[5][0] + "', price = '" + values[15] + "' WHERE vin_number = '" + values[12] + "'")
+    stringer4 = str ("UPDATE inventory set engine ='" + values[6] + "city_fuel_economy = " + str(float(values[13][:4])) + "hwy_fuel_economy = " + str(float(values[13][-8:-4])) + " WHERE vin_number = '" +values[12] )
+
+    cur.execute(stringer)
+    cur.execute(stringer2)
+    cur.execute(stringer3)
+    cur.execute(stringer4)
+
+
+    #print(values[13])
+    #print(values[13][:4])
+    #print(values[13][-8:-4])
+
 
     #id 13 to not be in the database
 
