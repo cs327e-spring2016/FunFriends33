@@ -27,6 +27,10 @@ def scrape ():
 
     # now collect the attributes of each car in turn
     # and put them in the database
+<<<<<<< Updated upstream
+=======
+    allattributes = []
+>>>>>>> Stashed changes
 
     for i in range(len(urls_to_scrape)): # only do first 3 for testing purposes             #len(urls_to_scrape)):
         car_url = urls_to_scrape[i]
@@ -53,6 +57,7 @@ def scrape ():
         value2.append(price)
         attribute2.append('Price')
 
+<<<<<<< Updated upstream
         allattributes = ['Year', 'Make', 'Model', 'Body style',
          '\n\t\t\t\t\t\t                                                    Mileage\n                                                \t\t\t\t\t', 'Transmission',
           'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon', 'Price']
@@ -60,12 +65,31 @@ def scrape ():
 
         fillnulls(value2, attribute2, allattributes)
         
+=======
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+        dbwrite(value2, attribute2)
+=======
+>>>>>>> Stashed changes
+        allattributes = ['Year', 'Make', 'Model', 'Body style', '\n\t\t\t\t\t\t                                                    Mileage\n                                                \t\t\t\t\t', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon', 'Price']
+        
+
+        fillnulls(value2, attribute2, allattributes)
+
+
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
         dbwrite(value2, allattributes)
+=======
+        #dbwrite(value2, allattributes)
+>>>>>>> Stashed changes
 
 #values and attributes are pairwise the same length
 #but they are not the same length all the time, so we need to check the attributes that a given car has before entering.
 #If a value is not there we need to add null instead
 #fill the values with null.
+>>>>>>> origin/master
 
 # this function parses the html section containing the price and returns the string of the integer value of the price 
 # i.e., gets rid of dollar signs, commas, html tags, etc. 
@@ -76,6 +100,13 @@ def get_price(price_mess):
         if ch.isdigit():
             price += ch 
     return price 
+
+#values and attributes are pairwise the same length
+#but they are not the same length all the time, so we need to check the attributes that a given car has before entering.
+#If a value is not there we need to add null instead
+#fill the values with null.
+
+
 
 # this function takes some attribute values and enters them into the database
 
