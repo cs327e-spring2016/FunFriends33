@@ -91,7 +91,7 @@ def dbwrite (values, attributes):
 
     cur = conn.cursor()
 
-    cur.execute("use rngmotors")
+    cur.execute("use rngmotor")
 
     cur.execute("SELECT vin_number from inventory")
 
