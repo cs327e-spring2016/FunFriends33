@@ -1,7 +1,8 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pymysql
-import string 
+import string
+import time 
 
 def scrape ():
 
@@ -52,12 +53,13 @@ def scrape ():
         value2.append(price)
         attribute2.append('Price')
 
-        allattributes = ['Year', 'Make', 'Model', 'Body style', '\n\t\t\t\t\t\t                                                    Mileage\n                                                \t\t\t\t\t', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon', 'Price']
+        allattributes = ['Year', 'Make', 'Model', 'Body style',
+         '\n\t\t\t\t\t\t                                                    Mileage\n                                                \t\t\t\t\t', 'Transmission',
+          'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon', 'Price']
         
 
         fillnulls(value2, attribute2, allattributes)
-
-
+        
         dbwrite(value2, allattributes)
 
 #values and attributes are pairwise the same length
@@ -87,7 +89,41 @@ def fillnulls(values,attributes, allattributes):
 
 def dbwrite (values, attributes):
 
-    
+    cur = conn.cursor()
+
+    cur.execute("use rngmotors")
+
+    cur.execute("SELECT vin_number from inventory")
+
+    #store the query in a string for handling    
+    fullstring = str("INSERT INTO inventory (year, make, model_name, mileage, transmission, engine, ext_color, int_color," +
+                    "num_doors, vin_number, hwy_fuel_economy, city_fuel_economy, conditions, price, date_added) " +
+                    "VALUES ('" + values[0] + "','" + values[1] + "','" + values[2] + "'," + get_price(values[4]) + ",'" +  values[5][0] + "','" +
+                    values[6] + "','" + values[8] + "','" + values[9] +"'," + (values[10] if values[10]=="NULL" else values[10][0]) + 
+                    ",'" + values[12] + "'," + str(float(values[13][-8:-4])) + "," + str(float(values[13][:4])) + ",'" + values[14] + "','" + values[15] + 
+                    "','" + time.strftime("%d/%m/%y") +"')" )
+
+    #error handling: for the primary key constraint not to stop the writing
+    try:
+        cur.execute(fullstring)
+        conn.commit()
+    except pymysql.err.IntegrityError as e :
+        print(e)
+        print("no changes made")
+        pass
+
+    #use the following to check if everything was added correctly
+    #cur.execute("SELECT * from inventory")
+    #data = cur.fetchall()
+    #print(data)
+
+    cur.close()
+
+
+def connect():
+    global conn
+
+
     '''        ------- David's Connection------ '''
     conn = pymysql.connect(host='localhost', port = 3306,
                         user = 'root', passwd='lenneth6')
@@ -98,54 +134,17 @@ def dbwrite (values, attributes):
                            user='dbproject',passwd='cs327e', db='mysql', charset='utf8')
     '''
     
-
-    cur = conn.cursor()
-
-    cur.execute("use rngmotors")
-
-    cur.execute("SELECT vin_number from inventory")
-
-
-    #this checks that the vin number is not already in the table
-    vinlist = list(cur.fetchall())
-    for i in range(len(vinlist)) :
-        if vinlist[i] == values[12] :
-            return
-
-    print(get_price(values[4]))
-
-
-
-    #values[12] is the vin number
-    stringer = str("INSERT INTO inventory (vin_number, model_name, ext_color, int_color) VALUES ('" + values[12] +"','" + values[2] + "','" +  values[9] + "','" + values[10] + "')")
-    stringer2 = str("UPDATE inventory set year ='" + values[0] + "', mileage ='" + get_price(values[4]) + "', conditions = '" + values[14] + "' WHERE vin_number = '" + values[12] + "' ")
-    stringer3 = str("UPDATE inventory set make ='" + values[1] +"', transmission = '" + values[5][0] + "', price = '" + values[15] + "' WHERE vin_number = '" + values[12] + "'")
-    stringer4 = str ("UPDATE inventory set engine ='" + values[6] + "city_fuel_economy = " + str(float(values[13][:4])) + "hwy_fuel_economy = " + str(float(values[13][-8:-4])) + " WHERE vin_number = '" +values[12] )
-
-    cur.execute(stringer)
-    cur.execute(stringer2)
-    cur.execute(stringer3)
-    cur.execute(stringer4)
-
-
-    #print(values[13])
-    #print(values[13][:4])
-    #print(values[13][-8:-4])
-
-
-    #id 13 to not be in the database
-
-    cur.close()
-
+def disconnect():
     conn.close()
-
 
 def main():
     #ask the user what they want to do
     #if data queary
     #if update table scrape
     #if update validation
+    connect()
     scrape()
+    disconnect()
 
 
 main()
