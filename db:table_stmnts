@@ -1,0 +1,30 @@
+CREATE DATABASE RANGERMOTORSAUSTIN;
+
+
+CREATE TABLE cars(
+	VIN varchar(30),
+	Year varchar(30),
+	Model varchar(30),
+	Body_Style varchar(30),
+	Mileage varchar(30),
+	Transmission varchar(30),
+	Engine varchar(30),
+	Drivetrain varchar(30),
+	Exterior varchar(30),
+	Interior varchar(30),
+	Doors varchar(30),
+	Stock varchar(30),
+	Fuel_Mileage varchar(30),
+	Condition varchar(30),);
+
+This table could use some better value types
+namely :
+	year
+	Mileage
+	Maybe engine
+	Probably engine
+	Doors
+	Maybe Fuel_Mileage
+	Probably
+but as long as you change the value types to the correct ones in the database,
+you need to also change the value types that were scraped as strings to the correct types in the pipeline.
