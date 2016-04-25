@@ -1,4 +1,5 @@
 import getpass
+import pymysql
 
 conn_host = ''
 conn_port = 0
@@ -36,7 +37,7 @@ elif db_connection=='n':
 else:
     mp = input('Do you have a Mac or PC? (m/p): ').strip().lower()
     if mp=='m':
-        conn_host = '127'
+        conn_host = '127.0.0.1'
         conn_user = input('Please enter your username: ').strip()
         conn_pass = getpass.getpass(prompt='Please enter your password: ')
         conn_sock = input('Please enter your unix socket string: ').strip()
@@ -49,10 +50,17 @@ else:
         conn_user = input('Please enter your username: ').strip()
         conn_pass = getpass.getpass(prompt='Please enter your password: ')
 
-conn = ''
+conn = 0
 if db_connection in ('a','n') or mp=='m':
-    conn = pymysql.connect(host=conn_host, unix_sock=conn_sock, user=conn_user, passwd=conn_pass, db=conn_db, charset=conn_chrs)
+    conn = pymysql.connect(host=conn_host, unix_socket=conn_sock, user=conn_user, passwd=conn_pass, db=conn_db, charset=conn_chrs)
 else:
     conn = pymysql.connect(host=conn_host, port=conn_port, user=conn_user, passwd=conn_pass)
 
 
+print (conn_host)
+print(conn_port)
+print(conn_user)
+print(conn_pass) 
+print(conn_sock)
+print(conn_db)  
+print(conn_chrs)
