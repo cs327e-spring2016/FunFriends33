@@ -63,7 +63,7 @@ for l in list_of_listing_dictionaries :
 list_of_insert_statements = []
 for l in list_of_listing_dictionaries :
 #		THIS IS WHERE YOU CHANGE THE TABLE INTO WHICH YOU INSERT RECORDS
-	insert_statement = 'INSERT INTO dddd SET '
+	insert_statement = 'INSERT INTO CarsForSale SET '
 	for key in l :
 		if key == 'Body style' :
 			insert_statement = insert_statement + 'Body_Style=("' + l[key] + '"), '
@@ -82,25 +82,7 @@ conn = pymysql.connect(host='127.0.0.1', unix_socket='/tmp/mysql.sock', user='ro
 
 cur = conn.cursor()
 #		THIS IS WHERE YOU CHANGE THE DATABASE USED
-cur.execute('CREATE DATABASE FunFriends33')
 cur.execute('USE FunFriends33')
-cur.execute('''CREATE TABLE carsForSale (
-	VIN varchar(30) primary key,
-	Price int,
-	Year year,
-	Make varchar(30),
-	Model varchar(30),
-	Body_Style varchar(30),
-	Mileage int,
-	Transmission varchar(30),
-	Engine varchar(30),
-	Drivetrain varchar(30),
-	Exterior varchar(30),
-	Interior varchar(30),
-	Doors int,
-	Stock varchar(30),
-	Fuel_Mileage varchar(30),
-	Conditon varchar(30))''')
 for ins_st in list_of_insert_statements :
 	cur.execute(ins_st)
 cur.close()
