@@ -26,3 +26,10 @@ cur.close()
 
 conn.commit()
 conn.close()
+
+
+
+
+
+['Price', 'Year', 'Make', 'Model', 'Body style', 'Mileage', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon']
+['INT','YEAR','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','INT','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','INT','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)']
