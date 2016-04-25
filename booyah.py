@@ -306,7 +306,17 @@ def query_interface(conn,cur):
             if stmt:
                 query += stmt + ' '
 
-        cur.execute(query)
+        try:
+            cur.execute(query)
+        except pymysql.err.InternalError as e :
+            print(e)
+            print()
+            print(query)
+            print()
+            print("Uh-oh! Looks like that query doesn\'t work! Sorry... ")
+            pass
+
+
         results = cur.fetchall()
         # print the results in a little bit cleaner of a way
         for a in results :
@@ -379,81 +389,116 @@ def get_connection():
 # this function scrapes the Ranger Motors website for all the car info,
 # then puts all the information in the database
 def pipeline(conn,cur):
-    # scrape all listing urls
-    inventory = urlopen('http://www.rangermotorsaustin.com/inventory/')
-    soup_inventory = BeautifulSoup(inventory.read(), 'html.parser')
 
-    listing_tags = soup_inventory.findAll('a', {'class':'inv-view-details'})
-    listing_urls = []
+    # scrape all listing urls and returns a list of listing urls
+    def get_list_of_listing_urls () : 
+        
+        inventory = urlopen('http://www.rangermotorsaustin.com/inventory/')
+        soup_inventory = BeautifulSoup(inventory.read(), 'html.parser')
 
-    for tag in listing_tags :
-        url = 'http://www.rangermotorsaustin.com' + tag.attrs['href']
-        listing_urls.append(url)
+        listing_tags = soup_inventory.findAll('a', {'class':'inv-view-details'})
+        listing_urls = []
 
-    list_of_listing_dictionaries = []
+        for tag in listing_tags :
+            url = 'http://www.rangermotorsaustin.com' + tag.attrs['href']
+            listing_urls.append(url)
 
-    # now for each individual listing : scrape all available key/value pairs into a dictionary and append the dictionary to our list of listing dictionaries
-    # IMPORTANT --------- STILL NEED TO SCRAPE THE PRICE
-    for url in listing_urls :
-        u = urlopen(url)
-        soup_listing = BeautifulSoup(u.read(), 'html.parser')
+        return listing_urls 
 
-        listing_dictionary = {}
-        ul_listgroup_tag = soup_listing.find('ul', class_='list-group')
-        li_listgroupitem_tags = ul_listgroup_tag.find_all('li', class_='list-group-item')
-        li_listgroupitem_tags = li_listgroupitem_tags[:-1]
+    # return dictionaries full of relevant data given a list of urls
+    def get_list_of_dictionaries (urls) : 
 
-        for tag in li_listgroupitem_tags :
-            span_tags = tag.find_all('span')
-            key = span_tags[0].get_text().strip()
-            val = span_tags[1].get_text().strip()
-            listing_dictionary[key] = val
+        list_of_listing_dictionaries = []
 
-        price = soup_listing.find('span', {'class':'details-price'}).get_text()
-        price = price.split()[2]
-        price = price.strip().replace(',', '').replace('$', '')
-        # print(price)
-        listing_dictionary['Price'] = price
+        for url in urls :
+            u = urlopen(url)
+            soup_listing = BeautifulSoup(u.read(), 'html.parser')
 
-        list_of_listing_dictionaries.append(listing_dictionary)
+            listing_dictionary = {}
+            ul_listgroup_tag = soup_listing.find('ul', class_='list-group')
+            li_listgroupitem_tags = ul_listgroup_tag.find_all('li', class_='list-group-item')
+            li_listgroupitem_tags = li_listgroupitem_tags[:-1]
 
-    list_of_keys = ['Price', 'Year', 'Make', 'Model', 'Body style', 'Mileage', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon']
+            for tag in li_listgroupitem_tags :
+                span_tags = tag.find_all('span')
+                key = span_tags[0].get_text().strip()
+                val = span_tags[1].get_text().strip()
+                listing_dictionary[key] = val
 
-    # fill in nulls
-    for l in list_of_listing_dictionaries :
-        for k in list_of_keys :
-            if not (k in l) :
-                l[k] = 'NULL'
+            price = soup_listing.find('span', {'class':'details-price'}).get_text()
+            price = price.split()[2]
+            price = price.strip().replace(',', '').replace('$', '')
+            listing_dictionary['Price'] = price
+            print('SCRAPED ' + listing_dictionary['Make'] + ' : ' + listing_dictionary['Model'])
 
-    # fix data types
-    for l in list_of_listing_dictionaries :
-        if not (l['Doors'] == 'NULL') :
-            l['Doors'] = l['Doors'][0]
-        l['Mileage'] = l['Mileage'].replace(',', '')
+            list_of_listing_dictionaries.append(listing_dictionary)
+
+        return list_of_listing_dictionaries
+
+    # fill in nulls for each dictionary and returns the modified list of dictionaries
+    def fill_in_nulls (list_of_dictionaries) : 
+
+        list_of_keys = ['Price', 'Year', 'Make', 'Model', 'Body style', 'Mileage', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon']
+
+        for l in list_of_dictionaries :
+            for k in list_of_keys :
+                if not (k in l) :
+                    l[k] = 'NULL'
+
+        return list_of_dictionaries
+
+    # change data types from string to integers where applicable and returns the modified list of dictionaries
+    def fix_data_types(list_of_dictionaries) : 
+        
+        for l in list_of_dictionaries :
+            if not (l['Doors'] == 'NULL') :
+                l['Doors'] = l['Doors'][0]
+            l['Mileage'] = l['Mileage'].replace(',', '')
+
+        return list_of_dictionaries
+
+    # create insert statement for each car and returns a list of insert statements
+    def create_list_of_insert_statements (list_of_dictionaries, vins) : 
+        list_of_insert_statements = []
+        for l in list_of_dictionaries :
+            b = False
+            for v in vins :
+                if l['VIN'] == v[0] :
+                    b = True
+            if not b :
+            #       THIS IS WHERE YOU CHANGE THE TABLE INTO WHICH YOU INSERT RECORDS
+                insert_statement = 'INSERT INTO CarsForSale SET '
+                for key in l :
+                    if key == 'Body style' :
+                        insert_statement = insert_statement + 'Body_Style=("' + l[key] + '"), '
+                    elif key == 'Fuel Mileage' :
+                        insert_statement = insert_statement + 'Fuel_Mileage=("' + l[key] + '"), '
+                    else :
+                        if not (l[key] == 'NULL') :
+                            insert_statement = insert_statement + key + '=("' + l[key] + '"), ' 
+                insert_statement = insert_statement[:-2]
+                list_of_insert_statements.append(insert_statement)
+
+        return list_of_insert_statements
+
+    urls = get_list_of_listing_urls()
+
+    dictionaries = get_list_of_dictionaries(urls)
+    dictionaries = fill_in_nulls(dictionaries)
+    dictionaries = fix_data_types(dictionaries)
 
 
-    # create insert statement for each car
+    # THIS IS WHERE YOU CHANGE THE DATABASE USED
+    cur.execute('USE FunFriends33')
 
-    list_of_insert_statements = []
-    for l in list_of_listing_dictionaries :
-    #       THIS IS WHERE YOU CHANGE THE TABLE INTO WHICH YOU INSERT RECORDS
-        insert_statement = 'INSERT INTO CarsForSale SET '
-        for key in l :
-            if key == 'Body style' :
-                insert_statement = insert_statement + 'Body_Style=("' + l[key] + '"), '
-            elif key == 'Fuel Mileage' :
-                insert_statement = insert_statement + 'Fuel_Mileage=("' + l[key] + '"), '
-            else :
-                if not (l[key] == 'NULL') :
-                    insert_statement = insert_statement + key + '=("' + l[key] + '"), ' 
-        insert_statement = insert_statement[:-2]
-        list_of_insert_statements.append(insert_statement)
+    # get all vins to check against
+    cur.execute('select vin from CarsForSale')
+    vins = cur.fetchall()
 
-    # maybe we should check the table for what vin numbers are already entries and update those?
-    # but as long as we're creating the db/table at run time that really shouldn't be a concern
-    #       THIS IS WHERE YOU CHANGE THE DATABASE USED
-    # cur.execute('USE FunFriends33')
-    for ins_st in list_of_insert_statements :
+    insert_statements = create_list_of_insert_statements(dictionaries, vins)
+
+    print('WRITE DATA INTO DATABASE')
+    for ins_st in insert_statements :
         cur.execute(ins_st)
 
     conn.commit()
