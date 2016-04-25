@@ -132,7 +132,7 @@ def dbwrite (values, attributes):
                     "VALUES ('" + values[0] + "','" + values[1] + "','" + values[2] + "'," + get_price(values[4]) + ",'" +  values[5][0] + "','" +
                     values[6] + "','" + values[8] + "','" + values[9] +"'," + (values[10] if values[10]=="NULL" else values[10][0]) + 
                     ",'" + values[12] + "'," + str(float(values[13][-8:-4])) + "," + str(float(values[13][:4])) + ",'" + values[14] + "','" + values[15] + 
-                    "','" + time.strftime("%d/%m/%y") +"')" )
+                    "','" + time.strftime("%y/%m/%d") +"')" )
 
     #error handling: for the primary key constraint not to stop the writing
     try:
