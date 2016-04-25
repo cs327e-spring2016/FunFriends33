@@ -25,7 +25,7 @@ list_of_listing_dictionaries = []
 
 # now for each individual listing : scrape all available key/value pairs into a dictionary and append the dictionary to our list of listing dictionaries
 # IMPORTANT --------- STILL NEED TO SCRAPE THE PRICE
-for url in listing_urls :
+for url in listing_urls[:3] :
 	u = urlopen(url)
 	soup_listing = BeautifulSoup(u.read(), 'html.parser')
 
@@ -55,7 +55,7 @@ for l in list_of_listing_dictionaries :
 list_of_insert_statements = []
 for l in list_of_listing_dictionaries :
 #		THIS IS WHERE YOU CHANGE THE TABLE INTO WHICH YOU INSERT RECORDS
-	insert_statement = 'INSERT INTO cars SET '
+	insert_statement = 'INSERT INTO bbbb SET '
 	for key in l :
 		if key == 'Body style' :
 			insert_statement = insert_statement + 'Body_Style=("' + l[key] + '"), '
@@ -64,7 +64,7 @@ for l in list_of_listing_dictionaries :
 		else :
 			insert_statement = insert_statement + key + '=("' + l[key] + '"), '	
 	insert_statement = insert_statement[:-2]
-	print(insert_statement)
+	print('GOOD WORK!')
 	list_of_insert_statements.append(insert_statement)
 
 # maybe we should check the table for what vin numbers are already entries and update those?
