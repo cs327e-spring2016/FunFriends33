@@ -38,8 +38,8 @@ for url in listing_urls :
 	price = soup_listing.find('span', {'class':'details-price'}).get_text()
 	price = price.split()[2]
 	price = price.strip().replace(',', '').replace('$', '')
-	print(price)
 	listing_dictionary['Price'] = price
+	print('SCRAPED ' + listing_dictionary['Make'] + ' : ' + listing_dictionary['Model'])
 
 	list_of_listing_dictionaries.append(listing_dictionary)
 
@@ -58,31 +58,38 @@ for l in list_of_listing_dictionaries :
 	l['Mileage'] = l['Mileage'].replace(',', '')
 
 
-# create insert statement for each car
-
-list_of_insert_statements = []
-for l in list_of_listing_dictionaries :
-#		THIS IS WHERE YOU CHANGE THE TABLE INTO WHICH YOU INSERT RECORDS
-	insert_statement = 'INSERT INTO CarsForSale SET '
-	for key in l :
-		if key == 'Body style' :
-			insert_statement = insert_statement + 'Body_Style=("' + l[key] + '"), '
-		elif key == 'Fuel Mileage' :
-			insert_statement = insert_statement + 'Fuel_Mileage=("' + l[key] + '"), '
-		else :
-			if not (l[key] == 'NULL') :
-				insert_statement = insert_statement + key + '=("' + l[key] + '"), '	
-	insert_statement = insert_statement[:-2]
-	list_of_insert_statements.append(insert_statement)
-
-# maybe we should check the table for what vin numbers are already entries and update those?
-# but as long as we're creating the db/table at run time that really shouldn't be a concern
-
 conn = pymysql.connect(host='127.0.0.1', unix_socket='/tmp/mysql.sock', user='root', passwd='MyNewPass', db='mysql')
 
 cur = conn.cursor()
 #		THIS IS WHERE YOU CHANGE THE DATABASE USED
 cur.execute('USE FunFriends33')
+cur.execute('select vin from CarsForSale')
+vins = cur.fetchall()
+# create insert statement for each car
+
+list_of_insert_statements = []
+for l in list_of_listing_dictionaries :
+	b = False
+	for v in vins :
+		if l['VIN'] == v[0] :
+			b = True
+	if not b :
+	#		THIS IS WHERE YOU CHANGE THE TABLE INTO WHICH YOU INSERT RECORDS
+		insert_statement = 'INSERT INTO CarsForSale SET '
+		for key in l :
+			if key == 'Body style' :
+				insert_statement = insert_statement + 'Body_Style=("' + l[key] + '"), '
+			elif key == 'Fuel Mileage' :
+				insert_statement = insert_statement + 'Fuel_Mileage=("' + l[key] + '"), '
+			else :
+				if not (l[key] == 'NULL') :
+					insert_statement = insert_statement + key + '=("' + l[key] + '"), '	
+		insert_statement = insert_statement[:-2]
+		list_of_insert_statements.append(insert_statement)
+
+# maybe we should check the table for what vin numbers are already entries and update those?
+# but as long as we're creating the db/table at run time that really shouldn't be a concern
+print('WRITE DATA INTO DATABASE')
 for ins_st in list_of_insert_statements :
 	cur.execute(ins_st)
 cur.close()
