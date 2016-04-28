@@ -505,41 +505,44 @@ def pipeline(conn,cur):
 
 # this function creates the FunFriends33 Database if the user does not already have it
 def create_db(conn,cur):
-    
+    have_db = False
     yn = '23'
     while yn not in ('y','n'): # make sure the user gives us a straight answer here, because a wrong answer will give a MySQL error
         yn = input('Have you already created a MySQL database entitled \'FunFriends33\' ? (y/n): ').strip().lower()
         if yn=='y':
             pass
+            have_db = True
         elif yn=='n':
             cur.execute('CREATE DATABASE FunFriends33')
         cur.execute('USE FunFriends33')
+    return have_db
 
 # this function creates the CarsForSale table if the user doesn't have one yet
-def create_table(conn,cur):
+def create_table(conn,cur,already_has_db):
     yn = '23'
-    while yn not in ('y','n'): # make sure the user gives us a straight answer here, because a wrong answer will give a MySQL error
-        yn = input('Have you already created a table entitled \'CarsForSale\' in your FunFriends33 database? (y/n): ').strip().lower()
-        if yn=='y':
-            pass
-        elif yn=='n':
-            cur.execute('''CREATE TABLE CarsForSale (
-                            VIN varchar(30) primary key,
-                            Price int,
-                            Year year,
-                            Make varchar(30),
-                            Model varchar(30),
-                            Body_Style varchar(30),
-                            Mileage int,
-                            Transmission varchar(30),
-                            Engine varchar(30),
-                            Drivetrain varchar(30),
-                            Exterior varchar(30),
-                            Interior varchar(30),
-                            Doors int,
-                            Stock varchar(30),
-                            Fuel_Mileage varchar(30),
-                            Conditon varchar(30))''')
+    if already_has_db:
+        while yn not in ('y','n'): # make sure the user gives us a straight answer here, because a wrong answer will give a MySQL error
+            yn = input('Have you already created a table entitled \'CarsForSale\' in your FunFriends33 database? (y/n): ').strip().lower()
+    if yn=='y':
+        pass
+    elif yn=='n' or not already_has_db:
+        cur.execute('''CREATE TABLE CarsForSale (
+                        VIN varchar(30) primary key,
+                        Price int,
+                        Year year,
+                        Make varchar(30),
+                        Model varchar(30),
+                        Body_Style varchar(30),
+                        Mileage int,
+                        Transmission varchar(30),
+                        Engine varchar(30),
+                        Drivetrain varchar(30),
+                        Exterior varchar(30),
+                        Interior varchar(30),
+                        Doors int,
+                        Stock varchar(30),
+                        Fuel_Mileage varchar(30),
+                        Conditon varchar(30))''')
 
             conn.commit()
 
@@ -551,9 +554,9 @@ def main():
     print()
     cur = conn.cursor()
     print()
-    create_db(conn,cur)
+    already_has_db = create_db(conn,cur)
     print()
-    create_table(conn,cur)
+    create_table(conn,cur,already_has_db)
     print()
     pipeline(conn,cur)
     print()
