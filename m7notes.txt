@@ -1,0 +1,9 @@
+
+
+
+shit to change :
+	
+	* make query results output look better
+	* add date added attribute 
+	* add maybe like a sold column or something
+	
