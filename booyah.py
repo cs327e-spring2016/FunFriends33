@@ -300,6 +300,8 @@ def query_interface(conn,cur):
         where_stmt = build_where()
         group_by_stmt,having_stmt,select_stmt = build_group_by_having(select_stmt)
         order_by_stmt = build_order_by()
+        
+
 
         query = ''
         for stmt in [select_stmt, from_stmt, where_stmt, order_by_stmt, group_by_stmt, having_stmt]:
