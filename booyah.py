@@ -7,7 +7,7 @@ import time
 
 # initialize the list of attributes, their types, their numeric-/stringy-ness, 
 # and the aggregate functions the user can use ... for the query interface
-attrs = ['Price', 'Year', 'Make', 'Model', 'Body style', 'Mileage', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon', 'Date_added']
+attrs = ['Price', 'Year', 'Make', 'Model', 'Body style', 'Mileage', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon', 'DateAdded']
 attr_types = ['INT','YEAR','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','INT','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','INT','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)', 'VARCHAR(10)']
 numeric_attrs = ['INT','FLOAT','YEAR']
 stringy_attrs = ['CHAR','VARCHAR(30)']
@@ -481,7 +481,7 @@ def pipeline(conn,cur):
                     else :
                         if not (l[key] == 'NULL') :
                             insert_statement = insert_statement + key + '=("' + l[key] + '"), '
-                insert_statement = insert_statement + 'Date_added=("' + time.strftime("%y/%m/%d") + '"), '
+                insert_statement = insert_statement + 'DateAdded=("' + time.strftime("%y/%m/%d") + '"), '
                 insert_statement = insert_statement[:-2]
                 list_of_insert_statements.append(insert_statement)
 
@@ -549,12 +549,8 @@ def create_table(conn,cur,already_has_db):
                         Stock varchar(30),
                         Fuel_Mileage varchar(30),
                         Conditon varchar(30),
-                        Date_added varchar(10))''')
+                        DateAdded varchar(10))''')
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
         conn.commit()
 
 
