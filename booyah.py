@@ -3,11 +3,12 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pymysql
 import getpass
+import time
 
 # initialize the list of attributes, their types, their numeric-/stringy-ness, 
 # and the aggregate functions the user can use ... for the query interface
-attrs = ['Price', 'Year', 'Make', 'Model', 'Body style', 'Mileage', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon']
-attr_types = ['INT','YEAR','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','INT','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','INT','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)']
+attrs = ['Price', 'Year', 'Make', 'Model', 'Body style', 'Mileage', 'Transmission', 'Engine', 'Drivetrain', 'Exterior', 'Interior', 'Doors', 'Stock', 'VIN', 'Fuel Mileage', 'Conditon', 'Date_added']
+attr_types = ['INT','YEAR','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','INT','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','INT','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)','VARCHAR(30)', 'VARCHAR(10)']
 numeric_attrs = ['INT','FLOAT','YEAR']
 stringy_attrs = ['CHAR','VARCHAR(30)']
 aggregate_fns = ['COUNT','MAX','MIN','SUM','AVG']
@@ -351,6 +352,7 @@ def get_connection():
         conn_port = 3306
         conn_user = 'root'
         conn_pass = 'lenneth6'
+        mp = 'p'
     elif db_connection=='a':
         conn_host = '127.0.0.1'
         conn_user = 'dbproject'
@@ -477,7 +479,8 @@ def pipeline(conn,cur):
                         insert_statement = insert_statement + 'Fuel_Mileage=("' + l[key] + '"), '
                     else :
                         if not (l[key] == 'NULL') :
-                            insert_statement = insert_statement + key + '=("' + l[key] + '"), ' 
+                            insert_statement = insert_statement + key + '=("' + l[key] + '"), '
+                insert_statement = insert_statement + 'Date_added=("' + time.strftime("%y/%m/%d") + '"), '
                 insert_statement = insert_statement[:-2]
                 list_of_insert_statements.append(insert_statement)
 
@@ -544,9 +547,11 @@ def create_table(conn,cur,already_has_db):
                         Doors int,
                         Stock varchar(30),
                         Fuel_Mileage varchar(30),
-                        Conditon varchar(30))''')
+                        Conditon varchar(30),
+                        Date_added varchar(10))''')
 
-            conn.commit()
+
+        conn.commit()
 
 
 
@@ -562,6 +567,11 @@ def main():
     print()
     pipeline(conn,cur)
     print()
+    #cur.execute("Select * from CarsForSale")
+    #turd = cur.fetchall()
+    #for i in turd:
+        #print (i)
+
     query_interface(conn,cur)
 
     conn.close()
