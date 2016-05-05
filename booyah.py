@@ -55,6 +55,7 @@ def query_interface(conn,cur):
                     return 'SELECT *'
         else:
             stmt += '* '
+            return stmt
         # delete the last comma from our select statement to make it syntactically correct
         stmt = stmt[:-2] + ' '
         return stmt 
@@ -321,10 +322,10 @@ def query_interface(conn,cur):
 
         results = cur.fetchall()
         # print the results in a little bit cleaner of a way
-        for a in results :
+        for result in results :
             st = ''
-            for b in a :
-                st = st + str(b) + ' : '
+            for attr_val in result :
+                st = st + str(attr_val) + ' : '
             print(st)
 
 
@@ -546,7 +547,7 @@ def create_table(conn,cur,already_has_db):
                         Fuel_Mileage varchar(30),
                         Conditon varchar(30))''')
 
-            conn.commit()
+        conn.commit()
 
 
 
