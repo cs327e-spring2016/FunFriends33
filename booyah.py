@@ -56,6 +56,7 @@ def query_interface(conn,cur):
                     return 'SELECT *'
         else:
             stmt += '* '
+            return stmt
         # delete the last comma from our select statement to make it syntactically correct
         stmt = stmt[:-2] + ' '
         return stmt 
@@ -155,9 +156,9 @@ def query_interface(conn,cur):
         print('Now we will build the where statement for our query. \n' +
               'Please tell me which of the attributes you would like to use to filter the results, \n' +
               'just as you did for the select statement. \n' +
-              '(If you would like to place more than one condition on an attribute,')
+              '(If you would not like to filter the results,')
         # this time we want a list, since the user might input an attribute more than once
-        where_attrs = (input('please enter that attribute the desired number of times as part of your input): ')).strip().split()
+        where_attrs = (input('please leave this line blank and simply press Enter/Return): ')).strip().split()
         stmt = ''
         # if we have some where attributes, we'll have a where clause, so go ahead and start that
         if where_attrs:
@@ -322,10 +323,10 @@ def query_interface(conn,cur):
 
         results = cur.fetchall()
         # print the results in a little bit cleaner of a way
-        for a in results :
+        for result in results :
             st = ''
-            for b in a :
-                st = st + str(b) + ' : '
+            for attr_val in result :
+                st = st + str(attr_val) + ' : '
             print(st)
 
 
@@ -550,7 +551,10 @@ def create_table(conn,cur,already_has_db):
                         Conditon varchar(30),
                         Date_added varchar(10))''')
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
         conn.commit()
 
 
