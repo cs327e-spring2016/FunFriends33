@@ -363,8 +363,8 @@ def get_connection():
         conn_chrs = 'utf8'
     elif db_connection=='n':
         conn_host = '127.0.0.1'
-        conn_user = 'dbproject'
-        conn_pass = 'cs327e'
+        conn_user = 'root'
+        conn_pass = 'MyNewPass'
         conn_sock = '/tmp/mysql.sock'
         conn_db   = 'mysql'
         conn_chrs = 'utf8'
