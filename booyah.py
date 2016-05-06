@@ -320,13 +320,33 @@ def query_interface(conn,cur):
             print("Uh-oh! Looks like that query doesn\'t work! Sorry... ")
             pass
 
-
         results = cur.fetchall()
+        # check lengths
+        a = []
+        for x in range(len(results[0])) :
+            a.append(0)
+        for r in results :
+            i = 0
+            for val in r :
+                if len(str(val)) > a[i] :
+                    a[i] = len(str(val))
+                i += 1
+            
+        h = select_stmt.split()[1:]
+        header = ''
+        i = 0
+        for attr in h :
+            header += attr.ljust(a[i]) + ' : '
+            i += 1
+        print(header)
+        
         # print the results in a little bit cleaner of a way
         for result in results :
             st = ''
+            i = 0
             for attr_val in result :
-                st = st + str(attr_val) + ' : '
+                st = st + str(attr_val).ljust(a[i]) + ' : '
+                i += 1
             print(st)
 
 
@@ -567,10 +587,7 @@ def main():
     print()
     pipeline(conn,cur)
     print()
-    #cur.execute("Select * from CarsForSale")
-    #turd = cur.fetchall()
-    #for i in turd:
-        #print (i)
+
 
     query_interface(conn,cur)
 
