@@ -335,9 +335,10 @@ def query_interface(conn,cur):
         h = select_stmt.split()[1:]
         header = ''
         i = 0
-        for attr in h :
-            header += attr.ljust(a[i]) + ' : '
+        for attr in h[:-1] :
+            header += attr[:-1].ljust(a[i]) + ' : '
             i += 1
+        header += h[-1].ljust(a[i]) + ' : '
         print(header)
         
         # print the results in a little bit cleaner of a way
