@@ -1,0 +1,17 @@
+
+
+
+shit to change :
+	
+	* make query results output look better
+	* add date added attribute 
+	* add maybe like a sold column or something
+	
+
+
+oh also we have to do a report: (in no particular order…. yet)
+
+	* show old and new "erd"
+		- describe the changes and why
+	* say what the problem is and how we solved it
+	* 
